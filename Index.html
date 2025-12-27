@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trust AI – Skill Tests Demo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  margin:0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg,#020617,#0f172a);
+  color:white;
+}
+.box{
+  max-width:400px;
+  margin:60px auto;
+  padding:22px;
+  background:#020617;
+  border-radius:14px;
+  box-shadow:0 0 25px rgba(34,211,238,0.25);
+}
+h1,h2{
+  text-align:center;
+  color:#22d3ee;
+}
+p{ font-size:14px; color:#cbd5f5; }
+input,textarea,button{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border-radius:8px;
+  border:none;
+  font-size:15px;
+}
+input,textarea{
+  background:#020617;
+  border:1px solid #334155;
+  color:white;
+}
+button{
+  background:#22d3ee;
+  color:black;
+  font-weight:bold;
+}
+.hidden{ display:none; }
+.badge{
+  background:#22c55e;
+  color:black;
+  padding:6px 12px;
+  border-radius:20px;
+  display:inline-block;
+  font-size:12px;
+  margin-top:6px;
+}
+.fail{ color:#f87171; }
+</style>
+</head>
+
+<body>
+
+<div class="box" id="loginPage">
+  <h1>Trust AI</h1>
+  <p style="text-align:center;">One Profile. Real Proof.</p>
+  <input id="email" type="email" placeholder="Email (demo)">
+  <input type="password" placeholder="Password (demo)">
+  <button onclick="enterDemo()">Enter Demo</button>
+</div>
+
+<div class="box hidden" id="profilePage">
+  <h2>Trust Profile</h2>
+  <p><b>Email:</b><br><span id="showEmail"></span></p>
+  <p><b>Trust ID:</b><br><span id="showId"></span></p>
+  <div id="badges"></div>
+  <br>
+  <button onclick="startHTML()">Start HTML Skill Test</button>
+  <button onclick="startData()">Start Data Entry Skill Test</button>
+  <button onclick="logout()" style="background:#f87171;">Logout</button>
+</div>
+
+<div class="box hidden" id="htmlTest">
+  <h2>HTML Skill Test</h2>
+  <p>1️⃣ Largest heading tag?</p>
+  <input id="h1">
+  <p>2️⃣ HTML stands for?</p>
+  <textarea id="h2"></textarea>
+  <p>3️⃣ Paragraph tag example</p>
+  <input id="h3">
+  <button onclick="submitHTML()">Submit</button>
+</div>
+
+<div class="box hidden" id="dataTest">
+  <h2>Data Entry Skill Test</h2>
+  <p>1️⃣ Type exactly: <b>Trust AI Platform</b></p>
+  <input id="d1">
+  <p>2️⃣ What is MS Excel mainly used for?</p>
+  <textarea id="d2"></textarea>
+  <p>3️⃣ Which key saves a file? (example: Ctrl+S)</p>
+  <input id="d3">
+  <button onclick="submitData()">Submit</button>
+</div>
+
+<div class="box hidden" id="resultPage">
+  <h2>Test Result</h2>
+  <p id="scoreText"></p>
+  <div id="resultBadge"></div>
+  <br>
+  <button onclick="goProfile()">Back to Profile</button>
+</div>
+
+<script>
+function enterDemo(){
+  const email=document.getElementById("email").value;
+  if(!email){ alert("Enter email"); return; }
+  localStorage.setItem("email",email);
+  localStorage.setItem("trustId","TA-"+Math.floor(100000+Math.random()*900000));
+  showProfile();
+}
+function showProfile(){
+  hideAll();
+  document.getElementById("profilePage").classList.remove("hidden");
+  document.getElementById("showEmail").innerText=localStorage.getItem("email");
+  document.getElementById("showId").innerText=localStorage.getItem("trustId");
+
+  let b="";
+  if(localStorage.getItem("htmlPass")==="yes") b+='<div class="badge">HTML Verified</div><br>';
+  if(localStorage.getItem("dataPass")==="yes") b+='<div class="badge">Data Entry Verified</div>';
+  document.getElementById("badges").innerHTML=b;
+}
+function startHTML(){ hideAll(); document.getElementById("htmlTest").classList.remove("hidden"); }
+function startData(){ hideAll(); document.getElementById("dataTest").classList.remove("hidden"); }
+
+function submitHTML(){
+  let s=0;
+  if(document.getElementById("h1").value.toLowerCase().includes("h1")) s++;
+  if(document.getElementById("h2").value.toLowerCase().includes("hypertext")) s++;
+  if(document.getElementById("h3").value.toLowerCase().includes("<p")) s++;
+  showResult(s,3,"htmlPass","HTML");
+}
+function submitData(){
+  let s=0;
+  if(document.getElementById("d1").value==="Trust AI Platform") s++;
+  if(document.getElementById("d2").value.toLowerCase().includes("data")) s++;
+  if(document.getElementById("d3").value.toLowerCase().includes("ctrl+s")) s++;
+  showResult(s,3,"dataPass","Data Entry");
+}
+function showResult(score,total,key,label){
+  hideAll();
+  document.getElementById("resultPage").classList.remove("hidden");
+  document.getElementById("scoreText").innerText=`Your Score: ${score} / ${total}`;
+  if(score>=2){
+    localStorage.setItem(key,"yes");
+    document.getElementById("resultBadge").innerHTML=`<div class="badge">${label} Skill Passed</div>`;
+  }else{
+    document.getElementById("resultBadge").innerHTML=`<div class="fail">❌ Not Passed. Try again.</div>`;
+  }
+}
+function goProfile(){ showProfile(); }
+function logout(){ localStorage.clear(); location.reload(); }
+function hideAll(){
+  ["loginPage","profilePage","htmlTest","dataTest","resultPage"]
+  .forEach(id=>document.getElementById(id).classList.add("hidden"));
+}
+if(localStorage.getItem("trustId")) showProfile();
+</script>
+
+</body>
+</html>
